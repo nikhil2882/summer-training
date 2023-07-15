@@ -1,0 +1,15 @@
+{
+  "name": "summer-training",
+  "version": "1.0.0",
+  "description": "a demo project",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "area-of-square": "^1.0.1",
+    "express": "^4.18.2"
+  }
+}
