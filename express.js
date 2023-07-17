@@ -11,6 +11,8 @@ app.use(function (req, res, next) {
   next();
 });
 
+app.use(express.json());
+
 app.get("/", function (request, response) {
   response.sendFile(__dirname + "/public/index.html");
 });
@@ -25,6 +27,20 @@ app.get("/contact", function (request, response) {
 
 app.get("/style.css", function (request, response) {
   response.sendFile(__dirname + "/public/css/style.css");
+});
+
+app.get("/todo", function (request, response) {
+  response.sendFile(__dirname + "/public/todo.html");
+});
+
+app.post("/todo", function (request, response) {
+  console.log(request.body);
+  response.status(200);
+  response.send();
+});
+
+app.get("/todo.js", function (request, response) {
+  response.sendFile(__dirname + "/public/js/todo.js");
 });
 
 app.get("*", function (request, response) {
