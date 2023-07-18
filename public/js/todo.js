@@ -3,6 +3,8 @@ const addTodoButton = document.getElementById("add-todo");
 
 const userName = prompt("Enter your name");
 
+getTodos();
+
 addTodoButton.addEventListener("click", function () {
   const todoTextValue = todoTextNode.value;
 
@@ -38,4 +40,22 @@ function addTodoToDOM(todo) {
   const todoItem = document.createElement("li");
   todoItem.innerText = todo;
   todoList.appendChild(todoItem);
+}
+
+function getTodos() {
+  fetch("/todos?name=" + userName)
+    .then(function (response) {
+      if (response.status !== 200) {
+        throw new Error("Something went wrong");
+      }
+      return response.json();
+    })
+    .then(function (todos) {
+      todos.forEach(function (todo) {
+        addTodoToDOM(todo.text);
+      });
+    })
+    .catch(function (error) {
+      alert(error);
+    });
 }
