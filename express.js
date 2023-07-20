@@ -62,6 +62,35 @@ app.post("/todo", function (request, response) {
   });
 });
 
+app.delete("/todo", function (request, response) {
+  const todo = request.body;
+
+  getTodos(null, true, function (error, todos) {
+    if (error) {
+      response.status(500);
+      response.json({ error: error });
+    } else {
+      const filteredTodos = todos.filter(function (todoItem) {
+        return todoItem.text !== todo.text;
+      });
+
+      fs.writeFile(
+        "./todos.mp4",
+        JSON.stringify(filteredTodos),
+        function (error) {
+          if (error) {
+            response.status(500);
+            response.json({ error: error });
+          } else {
+            response.status(200);
+            response.send();
+          }
+        }
+      );
+    }
+  });
+});
+
 app.get("/todo.js", function (request, response) {
   response.sendFile(__dirname + "/public/js/todo.js");
 });

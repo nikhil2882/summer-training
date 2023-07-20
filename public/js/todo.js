@@ -40,6 +40,16 @@ function addTodoToDOM(todo) {
   const todoItem = document.createElement("li");
   todoItem.innerText = todo;
   todoList.appendChild(todoItem);
+
+  todoItem.addEventListener("click", function () {
+    deleteTodo(todo, function (error) {
+      if (error) {
+        alert(error);
+      } else {
+        todoList.removeChild(todoItem);
+      }
+    });
+  });
 }
 
 function getTodos() {
@@ -58,4 +68,18 @@ function getTodos() {
     .catch(function (error) {
       alert(error);
     });
+}
+
+function deleteTodo(todo, callback) {
+  fetch("/todo", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: todo, createdBy: userName }),
+  }).then(function (response) {
+    if (response.status === 200) {
+      callback();
+    } else {
+      callback("Something went wrong");
+    }
+  });
 }
