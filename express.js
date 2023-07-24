@@ -2,6 +2,8 @@ const express = require("express");
 const fs = require("fs");
 const app = express();
 
+var session = require("express-session");
+
 app.use(function (req, res, next) {
   // execute anything before the route handler here
 
@@ -12,10 +14,38 @@ app.use(function (req, res, next) {
   next();
 });
 
+app.use(
+  session({
+    secret: "iamasecret on a linux",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", function (request, response) {
-  response.sendFile(__dirname + "/public/index.html");
+  if (request.session.isLoggedIn) {
+    console.log(request.session.username);
+    response.sendFile(__dirname + "/public/index.html");
+    return;
+  }
+
+  response.redirect("/login");
+});
+
+app.get("/login", function (request, response) {
+  if (request.session.isLoggedIn) {
+    response.redirect("/");
+    return;
+  }
+
+  response.sendFile(__dirname + "/public/login.html");
+});
+
+app.get("/signup", function (request, response) {
+  response.sendFile(__dirname + "/public/signup.html");
 });
 
 app.get("/about", function (request, response) {
@@ -93,6 +123,33 @@ app.delete("/todo", function (request, response) {
 
 app.get("/todo.js", function (request, response) {
   response.sendFile(__dirname + "/public/js/todo.js");
+});
+
+app.post("/login", function (request, response) {
+  const username = request.body.username;
+  const password = request.body.password;
+
+  if (username === "n" && password === "n") {
+    request.session.isLoggedIn = true;
+    request.session.username = username;
+
+    response.redirect("/");
+  } else {
+    response.status(403);
+    response.send();
+  }
+});
+
+app.post("/signup", function (request, response) {
+  const username = request.body.username;
+  const password = request.body.password;
+
+  if (username === "n" && password === "n") {
+    response.redirect("/login");
+  } else {
+    response.status(403);
+    response.send();
+  }
 });
 
 app.get("*", function (request, response) {
