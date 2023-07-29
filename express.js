@@ -1,8 +1,21 @@
 const express = require("express");
 const fs = require("fs");
 const app = express();
+const multer = require("multer");
+
+const upload = multer({ dest: "uploads/" });
 
 var session = require("express-session");
+
+app.set("view engine", "ejs");
+
+app.use(express.static("public"));
+
+// if you want to change the default folder for views
+// you can use the following line
+//app.set("views" , __dirname + "/public");
+
+app.use(express.static("uploads"));
 
 app.use(function (req, res, next) {
   // execute anything before the route handler here
@@ -22,13 +35,18 @@ app.use(
   })
 );
 
+// single will be used if you are uploading a single file
+// array will be used if you are uploading multiple files
+// pic is the name of the input field in the form
+app.use(upload.single("pic"));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", function (request, response) {
   if (request.session.isLoggedIn) {
     console.log(request.session.username);
-    response.sendFile(__dirname + "/public/index.html");
+    response.render("index", { username: request.session.username });
     return;
   }
 
@@ -41,11 +59,11 @@ app.get("/login", function (request, response) {
     return;
   }
 
-  response.sendFile(__dirname + "/public/login.html");
+  response.render("login", { error: null });
 });
 
 app.get("/signup", function (request, response) {
-  response.sendFile(__dirname + "/public/signup.html");
+  response.render("signup", { error: null });
 });
 
 app.get("/about", function (request, response) {
@@ -56,12 +74,32 @@ app.get("/contact", function (request, response) {
   response.sendFile(__dirname + "/public/contact.html");
 });
 
-app.get("/style.css", function (request, response) {
+// comment this out if you are using the static middleware
+/* app.get("/style.css", function (request, response) {
   response.sendFile(__dirname + "/public/css/style.css");
-});
+}); */
 
 app.get("/todo", function (request, response) {
-  response.sendFile(__dirname + "/public/todo.html");
+  if (!request.session.isLoggedIn) {
+    response.redirect("/login");
+    return;
+  }
+
+  const userName = request.session.username;
+  const profilePic = request.session.profilePic;
+
+  getTodos(userName, false, function (error, todos) {
+    if (error) {
+      response.status(500);
+      response.json({ error: error });
+    } else {
+      response.render("todo", {
+        todos: todos,
+        userName: userName,
+        profilePic: profilePic,
+      });
+    }
+  });
 });
 
 app.get("/todos", function (request, response) {
@@ -80,6 +118,8 @@ app.get("/todos", function (request, response) {
 
 app.post("/todo", function (request, response) {
   const todo = request.body;
+
+  todo.createdBy = request.session.username;
 
   saveTodos(todo, function (error) {
     if (error) {
@@ -121,35 +161,54 @@ app.delete("/todo", function (request, response) {
   });
 });
 
-app.get("/todo.js", function (request, response) {
+// comment this out if you are using the static middleware
+/* app.get("/todo.js", function (request, response) {
   response.sendFile(__dirname + "/public/js/todo.js");
 });
-
+ */
 app.post("/login", function (request, response) {
   const username = request.body.username;
   const password = request.body.password;
 
-  if (username === "n" && password === "n") {
-    request.session.isLoggedIn = true;
-    request.session.username = username;
+  getAllUsers(function (error, users) {
+    if (error) {
+      response.render("login", { error: error });
+    } else {
+      const user = users.find(function (user) {
+        return user.username === username && user.password === password;
+      });
 
-    response.redirect("/");
-  } else {
-    response.status(403);
-    response.send();
-  }
+      if (user) {
+        request.session.isLoggedIn = true;
+        request.session.username = username;
+        request.session.profilePic = user.profilePic;
+
+        response.redirect("/");
+      } else {
+        response.render("login", { error: "Invalid username or password" });
+      }
+    }
+  });
 });
 
 app.post("/signup", function (request, response) {
   const username = request.body.username;
   const password = request.body.password;
+  const profilePic = request.file;
 
-  if (username === "n" && password === "n") {
-    response.redirect("/login");
-  } else {
-    response.status(403);
-    response.send();
-  }
+  const user = {
+    username: username,
+    password: password,
+    profilePic: profilePic.filename,
+  };
+
+  saveUser(user, function (error) {
+    if (error) {
+      response.render("signup", { error: error });
+    } else {
+      response.redirect("/login");
+    }
+  });
 });
 
 app.get("*", function (request, response) {
@@ -197,6 +256,43 @@ function saveTodos(todo, callback) {
       todos.push(todo);
 
       fs.writeFile("./todos.mp4", JSON.stringify(todos), function (error) {
+        if (error) {
+          callback(error);
+        } else {
+          callback();
+        }
+      });
+    }
+  });
+}
+
+function getAllUsers(callback) {
+  fs.readFile("./users.gif", "utf-8", function (error, data) {
+    if (error) {
+      callback(error);
+    } else {
+      if (data.length === 0) {
+        data = "[]";
+      }
+
+      try {
+        let users = JSON.parse(data);
+        callback(null, users);
+      } catch (error) {
+        callback(null, []);
+      }
+    }
+  });
+}
+
+function saveUser(user, callback) {
+  getAllUsers(function (error, users) {
+    if (error) {
+      callback(error);
+    } else {
+      users.push(user);
+
+      fs.writeFile("./users.gif", JSON.stringify(users), function (error) {
         if (error) {
           callback(error);
         } else {

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Todo List</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      header {
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+      }
+
+      div {
+        display: flex;
+        justify-content: center;
+        margin: 20px;
+      }
+
+      input[type="text"] {
+        border: none;
+        border-bottom: 2px solid #333;
+        font-size: 16px;
+        margin-right: 10px;
+        padding: 5px;
+        width: 70%;
+      }
+
+      input[type="submit"] {
+        background-color: #333;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 5px 10px;
+      }
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      li {
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+      }
+
+      li:last-child {
+        border-bottom: none;
+      }
+
+      .completed {
+        text-decoration: line-through;
+      }
+
+      .delete {
+        color: #f00;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include("component/header", { username: userName, pic: profilePic}) %>
+    <header>
+      <h1>Todo List</h1>
+    </header>
+    <div>
+      <input type="text" id="new-todo" placeholder="Add new todo..." />
+      <button id="add-todo">Add</button>
+    </div>
+
+    <ul id="todo-list">
+      <% todos.forEach(function(todo) { %>
+
+      <li><%= todo.text %></li>
+
+      <% }) %>
+    </ul>
+  </body>
+  <script src="/js/todo.js"></script>
+</html>

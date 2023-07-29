@@ -1,9 +1,9 @@
 const todoTextNode = document.getElementById("new-todo");
 const addTodoButton = document.getElementById("add-todo");
 
-const userName = prompt("Enter your name");
+//const userName = prompt("Enter your name");
 
-getTodos();
+//getTodos();
 
 addTodoButton.addEventListener("click", function () {
   const todoTextValue = todoTextNode.value;
@@ -25,7 +25,7 @@ function saveTodo(todo, callback) {
   fetch("/todo", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: todo, createdBy: userName }),
+    body: JSON.stringify({ text: todo }),
   }).then(function (response) {
     if (response.status === 200) {
       callback();

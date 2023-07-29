@@ -1,0 +1,27 @@
+<style>
+  nav {
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #ccc;
+    overflow: hidden;
+  }
+  nav a {
+    display: block;
+    float: left;
+    color: #333;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  nav a:hover {
+    background-color: #ddd;
+  }
+</style>
+
+<nav>
+  <a href="/">Home</a>
+  <a href="/about">About</a>
+  <a href="/contact">Contact</a>
+  <a href="/todo">Todo</a>
+  <p>Logged in as <%= username %></p>
+  <img src="<%= pic %>" />
+</nav>

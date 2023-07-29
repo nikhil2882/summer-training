@@ -43,12 +43,31 @@
       .team-member p {
         margin-bottom: 0;
       }
+      nav {
+        background-color: #f2f2f2;
+        border-bottom: 1px solid #ccc;
+        overflow: hidden;
+      }
+      nav a {
+        display: block;
+        float: left;
+        color: #333;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+      }
+      nav a:hover {
+        background-color: #ddd;
+      }
     </style>
   </head>
   <body>
-    <header>
-      <h1>About Us</h1>
-    </header>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/todo">Todo</a>
+    </nav>
     <div class="container">
       <h2>Our Team</h2>
       <div class="team-member">
